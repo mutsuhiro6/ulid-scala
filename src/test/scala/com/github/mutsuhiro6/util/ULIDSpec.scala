@@ -8,7 +8,7 @@ import com.github.mutsuhiro6.util.ULID
 class ULIDSpec extends AnyFlatSpec with should.Matchers:
 
   "ULID" should "have string which length is 26." in {
-    val ulid = ULID.randomULID
+    val ulid = ULID.randomULID.toString
     ulid.length should be(26)
   }
 
@@ -20,7 +20,7 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
   }
 
   it should "matches regular expression \"[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}]\"." in {
-    ULID.randomULID
+    ULID.randomULID.toString
       .matches("[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}") should be(true)
   }
 
