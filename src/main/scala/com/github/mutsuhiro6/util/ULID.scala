@@ -38,7 +38,7 @@ case class ULID(mostSigBits: Long, leastSigBits: Long)
   * ==Overview==
   * The main use may be generating a random ULID string, as so
   * {{{
-  * scala> val ulid = ULID.randomULID
+  * scala> val ulid = ULID.randomULID.toString
   * val ulid: String = 01FTJ5FZE7KVDKV46Y5XK23QNW
   * }}}
   * To simply generate a ULID instance.
@@ -107,10 +107,10 @@ object ULID:
       (randomness(9) & 0xffL)
     ULID(msb, lsb)
 
-  /** Generate ULID String. */
-  def randomULID: String = apply().toString
+  /** Generate a random ULID */
+  def randomULID: ULID = apply()
 
-  /** Generate ULID instance from String. */
+  /** Generate a ULID instance from String. */
   def fromString(ulid: String): ULID =
     require(
       ulid.length == 26,
@@ -189,7 +189,7 @@ object ULID:
   * ==Overview==
   * The main use may be generating a random ULID string monotonically, as so
   * {{{
-  * scala> val ulid = ULID.randomULID
+  * scala> val ulid = ULID.randomULID.toString
   * val ulid: String = 01FTJ5FZE7KVDKV46Y5XK23QNW
   * }}}
   * To simply generate a monotonical ULID instance.
@@ -228,7 +228,7 @@ object MonotonicULID:
     previousULID.set(ulid)
     ulid
 
-  /** Generate a ULID string monotonically. */
-  def randomULID: String = apply().toString
+  /** Generate a ULID monotonically. */
+  def randomULID: ULID = apply()
 
   private[util] def setPreviousULID(ulid: ULID): Unit = previousULID.set(ulid)
