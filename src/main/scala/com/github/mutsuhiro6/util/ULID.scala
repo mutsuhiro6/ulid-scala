@@ -206,7 +206,7 @@ object ULID:
 object MonotonicULID:
 
   /** Hold previous data of ULID. */
-  private var previousULID: AtomicReference[ULID] = AtomicReference[ULID]()
+  private val previousULID: AtomicReference[ULID] = AtomicReference[ULID]()
 
   /** Default timestamp generator function. */
   private val timestamp: () => Long = () => System.currentTimeMillis
