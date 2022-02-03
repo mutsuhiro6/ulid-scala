@@ -1,10 +1,9 @@
 package com.github.mutsuhiro6.util.ulid
 
-import java.security.SecureRandom
 import java.security.NoSuchAlgorithmException
-import scala.util.Failure
-import scala.collection.mutable
+import java.security.SecureRandom
 import java.util.concurrent.atomic.AtomicReference
+import scala.collection.mutable
 
 /** Default timestamp generator function. */
 private val timestamp: () => Long = () => System.currentTimeMillis
@@ -177,12 +176,11 @@ object ULID:
       ulid: String,
       decode: Char => Byte = crockfordsBase32Decoder
   ): ULID =
-    val carryBitMask = ~(~0L >>> 5) // 0xF8000....0L
     var msb = 0L
     var lsb = 0L
     for i <- 0 until 26 do
       msb <<= 5
-      msb |= ((lsb & carryBitMask) >>> (64 - 5))
+      msb |= ((lsb & ~(~0L >>> 5)) >>> (64 - 5)) //~(~0L >>> 5) is 0xF800...0L
       lsb <<= 5
       lsb |= decode(ulid.charAt(i))
     ULID(msb, lsb)

@@ -1,10 +1,9 @@
 package benchmark.ulid
 
 import com.chatwork.scala.ulid.{ULID => ChatworkULID}
+import com.github.mutsuhiro6.util.ulid.{ULID => M6ULID}
 import de.huxhorn.sulky.ulid.{ULID => SulkyULID}
 import net.petitviolet.ulid4s.{ULID => PetitvioletULID}
-import com.github.mutsuhiro6.util.ulid.{ULID => M6ULID}
-import com.github.mutsuhiro6.util.ulid.{MonotonicULID => M6MonoULID}
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Mode
@@ -45,8 +44,3 @@ class ULIDGen :
   @Benchmark
   def m6ULID =
     M6ULID.randomULID.toString
-  
-  // @Benchmark
-  // def mutsuhiroMonoULID =
-  //   M6MonoULID.randomULID.toString
-

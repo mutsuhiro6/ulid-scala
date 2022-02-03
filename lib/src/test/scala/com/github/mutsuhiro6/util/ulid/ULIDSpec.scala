@@ -3,7 +3,6 @@ package com.github.mutsuhiro6.util.ulid
 import org.scalatest._
 import flatspec._
 import matchers._
-import com.github.mutsuhiro6.util.ulid.ULID
 
 class ULIDSpec extends AnyFlatSpec with should.Matchers:
 
