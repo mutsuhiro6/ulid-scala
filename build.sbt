@@ -16,7 +16,7 @@ val scala2Version = "2.13.6"
 lazy val benchmark = project
   .in(file("benchmark"))
   .settings(
-    name := "ulid-benchmark",
+    name := "ulid-scala3-benchmark",
     publish / skip := true,
     libraryDependencies ++= Seq(
       "com.chatwork" % "scala-ulid_2.13" % "1.0.24",
@@ -30,6 +30,22 @@ lazy val benchmark = project
   .enablePlugins(JmhPlugin)
   .dependsOn(lib)
 
+lazy val example = project
+  .in(file("example"))
+  .settings(
+    name := "ulid-scala3-example",
+    publish / skip := true,
+     libraryDependencies ++= Seq(
+      "com.chatwork" % "scala-ulid_2.13" % "1.0.24",
+      "org.wvlet.airframe" %% "airframe-ulid" % "21.12.1",
+      "de.huxhorn.sulky" % "de.huxhorn.sulky.ulid" % "8.3.0"
+    ),
+    scalaVersion := scala3Version,
+    crossScalaVersions := Seq(scala3Version, scala2Version)
+  )
+  .dependsOn(lib)
+
 lazy val root = project
   .in(file("."))
+  .settings(name := "ulid-scala3-root")
   .aggregate(lib)
