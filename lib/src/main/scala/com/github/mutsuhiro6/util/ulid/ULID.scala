@@ -1,10 +1,26 @@
-package com.github.mutsuhiro6.util
+package com.github.mutsuhiro6.util.ulid
 
 import java.security.SecureRandom
 import java.security.NoSuchAlgorithmException
 import scala.util.Failure
 import scala.collection.mutable
 import java.util.concurrent.atomic.AtomicReference
+
+/** Default timestamp generator function. */
+private val timestamp: () => Long = () => System.currentTimeMillis
+
+/** Default random number (10 bytes) generator function. */
+private val random: () => Array[Byte] =
+  val defaultAlgorithm = "NativePRNGNonBlocking"
+  val random =
+    try SecureRandom.getInstance(defaultAlgorithm)
+    catch
+      case _: NoSuchAlgorithmException =>
+        SecureRandom.getInstanceStrong
+  () =>
+    val randomBytes = Array.ofDim[Byte](10)
+    random.nextBytes(randomBytes)
+    randomBytes
 
 /** ULID (Universally Unique Lexicographically Sortable Identifier) It is
   * defined by 128 bits.
@@ -28,11 +44,9 @@ case class ULID(mostSigBits: Long, leastSigBits: Long)
   override def toString: String = ulidStr
 
   override def compare(that: ULID): Int =
-    if this.mostSigBits < that.mostSigBits then -1
-    else if this.mostSigBits > that.mostSigBits then 1
-    else if this.leastSigBits < that.leastSigBits then -1
-    else if this.leastSigBits > that.leastSigBits then 1
-    else 0
+    val msbCompare = mostSigBits compare that.mostSigBits
+    if msbCompare == 0 then leastSigBits compare that.leastSigBits
+    else msbCompare
 
 /** Provides functions to generate ULID instances.
   * ==Overview==
@@ -44,38 +58,22 @@ case class ULID(mostSigBits: Long, leastSigBits: Long)
   * To simply generate a ULID instance.
   * {{{
   * scala> val ulid = ULID()
-  * val ulid: com.github.mutsuhiro6.util.ULID = 01FTJ4YSZVCGN9NB1ZJDPPJ6NK
+  * val ulid: com.github.mutsuhiro6.util.ulid.ULID = 01FTJ4YSZVCGN9NB1ZJDPPJ6NK
   * }}}
-  * You can also create a ULID instance from specific timestamp.
+  * You can also create a ULID object from specific timestamp.
   * {{{
   * val ulid = ULID(1643435103204L)
-  * val ulid: com.github.mutsuhiro6.util.ULID = 01FTJ5V4Z4RH95533VSPW147DA
+  * val ulid: com.github.mutsuhiro6.util.ulid.ULID = 01FTJ5V4Z4RH95533VSPW147DA
   * }}}
   * Also provides the conversion to a ULID object from a String.
   * {{{
   * val ulid = ULID.fromString("61VB9NT4CB0KG8ZP3384TBVBYS")
-  * val ulid: com.github.mutsuhiro6.util.ULID = 61VB9NT4CB0KG8ZP3384TBVBYS
+  * val ulid: com.github.mutsuhiro6.util.ulid.ULID = 61VB9NT4CB0KG8ZP3384TBVBYS
   * }}}
   */
 object ULID:
 
-  /** Default timestamp generator function. */
-  private val timestamp: () => Long = () => System.currentTimeMillis
-
-  /** Default random number (10 bytes) generator function. */
-  private val random: () => Array[Byte] =
-    val defaultAlgorithm = "NativePRNGNonBlocking"
-    val random =
-      try SecureRandom.getInstance(defaultAlgorithm)
-      catch
-        case _: NoSuchAlgorithmException =>
-          SecureRandom.getInstanceStrong
-    () =>
-      val randomBytes = Array.ofDim[Byte](10)
-      random.nextBytes(randomBytes)
-      randomBytes
-
-  /** Returns a ULID instance with timestamp and random byte array.
+  /** Returns a ULID object with timestamp and random byte array.
     * @param timestamp
     *   Timestamp (milli-order)
     * @param randomness
@@ -92,6 +90,10 @@ object ULID:
     require(
       timestamp <= 0xffffffffffffL, // 281474976710655
       s"Timestamp must be less than ${0xffffffffffffL} (48 bits), but got ${timestamp}."
+    )
+    require(
+      timestamp >= 0,
+      s"Timestamp must be positive, but got ${timestamp}."
     )
     val msb: Long =
       (timestamp & 0xffffffffffffL) << (64 - 48) | // 48 bits timestamp part
@@ -170,7 +172,7 @@ object ULID:
       msb >>>= 5
     encoded.reverseContents.toString
 
-  /** Decode a ULID String into a ULID instance. */
+  /** Decode a ULID String into a ULID object. */
   private def base32Decode(
       ulid: String,
       decode: Char => Byte = crockfordsBase32Decoder
@@ -195,21 +197,29 @@ object ULID:
   * To simply generate a monotonical ULID instance.
   * {{{
   * scala> val ulid = ULID()
-  * val ulid: com.github.mutsuhiro6.util.ULID = 01FTJ4YSZVCGN9NB1ZJDPPJ6NK
+  * val ulid: com.github.mutsuhiro6.util.ulid.ULID = 01FTJ4YSZVCGN9NB1ZJDPPJ6NK
   * }}}
   * You can also create a monotonical ULID instance from specific timestamp.
   * {{{
   * val ulid = ULID(1643435103204L)
-  * val ulid: com.github.mutsuhiro6.util.ULID = 01FTJ5V4Z4RH95533VSPW147DA
+  * val ulid: com.github.mutsuhiro6.util.ulid.ULID = 01FTJ5V4Z4RH95533VSPW147DA
   * }}}
   */
 object MonotonicULID:
 
   /** Hold previous data of ULID. */
-  private val previousULID: AtomicReference[ULID] = AtomicReference[ULID]()
+  private lazy val previousULID: AtomicReference[ULID] =
+    AtomicReference[ULID](ULID.randomULID)
 
-  /** Default timestamp generator function. */
-  private val timestamp: () => Long = () => System.currentTimeMillis
+  /** Generate a ULID monotonically from specific timestamp. */
+  def apply(timestamp: Long = timestamp()): ULID =
+    previousULID.updateAndGet(ulid =>
+      if ulid.timestamp != timestamp then ULID(timestamp)
+      else increment(ulid)
+    )
+
+  /** Generate a ULID monotonically. */
+  def randomULID: ULID = apply()
 
   /** Increment ULID with carrying. */
   private def increment(ulid: ULID): ULID =
@@ -219,16 +229,4 @@ object MonotonicULID:
       ULID(ulid.mostSigBits + 1, 0)
     else throw new ArithmeticException("Randomness part overflowed.")
 
-  /** Generate a ULID monotonically from specific timestamp. */
-  def apply(timestamp: Long = timestamp()): ULID =
-    val ulid =
-      if previousULID.get == null then ULID(timestamp)
-      else if previousULID.get.timestamp != timestamp then ULID(timestamp)
-      else increment(previousULID.get)
-    previousULID.set(ulid)
-    ulid
-
-  /** Generate a ULID monotonically. */
-  def randomULID: ULID = apply()
-
-  private[util] def setPreviousULID(ulid: ULID): Unit = previousULID.set(ulid)
+  private[ulid] def setPreviousULID(ulid: ULID): Unit = previousULID.set(ulid)

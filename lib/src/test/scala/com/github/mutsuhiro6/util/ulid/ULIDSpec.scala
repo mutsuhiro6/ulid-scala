@@ -1,9 +1,9 @@
-package com.github.mutsuhiro6.util
+package com.github.mutsuhiro6.util.ulid
 
 import org.scalatest._
 import flatspec._
 import matchers._
-import com.github.mutsuhiro6.util.ULID
+import com.github.mutsuhiro6.util.ulid.ULID
 
 class ULIDSpec extends AnyFlatSpec with should.Matchers:
 
@@ -13,7 +13,7 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
   }
 
   it should "have the same bit info with generated from ULID string." in {
-    val ulid01 = ULID();
+    val ulid01 = ULID.randomULID
     val ulidStr = ulid01.toString
     val ulid02 = ULID.fromString(ulidStr)
     ulid01 should be(ulid02)
@@ -36,21 +36,28 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
   }
 
   "ULID.fromString" should "reject too large ULID (\"8ZZZZZZZZZZZZZZZZZZZZZZZZZ\")." in {
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(
-      "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-    )
+    val tooLargeUlid = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
+    a[IllegalArgumentException] should be thrownBy ULID.fromString(tooLargeUlid)
+  }
+
+  it should "generate zero-filled String" in {
+    val ulid = ULID(0, Array.fill[Byte](10)(0))
+    ulid.toString should be("00000000000000000000000000")
   }
 
   it should "reject invalid length ULID like \"0123456789ABCDEFGHJKMNPQRSTVWXYZ\")" in {
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(
-      "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-    )
+    val tooLongUlid = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+    a[IllegalArgumentException] should be thrownBy ULID.fromString(tooLongUlid)
   }
 
   it should "reject invalid character like \"\\t\"" in {
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(
-      "6ABC:EJ\nF9\r12HGJS0021\t1234"
-    )
+    val invalidUlid = "6ABC:EJ\nF9\r12HGJS0021\t1234"
+    a[IllegalArgumentException] should be thrownBy ULID.fromString(invalidUlid)
+  }
+
+  it should "reject negative timestamp value" in {
+    val timestamp = -1643530852706L
+    a[IllegalArgumentException] should be thrownBy ULID(timestamp)
   }
 
   "MonotonicULID" should "generate incremented ULID when called multiple times at the same timestamp." in {
