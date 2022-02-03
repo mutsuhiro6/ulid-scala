@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.Throughput))
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.SECONDS)
 class ULIDCompare:
 
   @Benchmark
