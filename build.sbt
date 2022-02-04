@@ -22,7 +22,7 @@ ThisBuild / version := {
   if (getCurrentBranchName == "main") {
     val latestTag = getLatestTagOnCurrentBranch
     if (isConformedSemVerSpec(latestTag)) latestTag
-    else null
+    else getLatestCommitHash + "-" + getLatestCommitTimestamp + "-SNAPSHOT"
   } else getLatestCommitHash + "-" + getLatestCommitTimestamp + "-SNAPSHOT"
 }
 
