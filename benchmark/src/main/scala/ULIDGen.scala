@@ -1,7 +1,7 @@
 package benchmark.ulid
 
 import com.chatwork.scala.ulid.{ULID => ChatworkULID}
-import com.github.mutsuhiro6.util.ulid.{ULID => M6ULID}
+import com.github.mutsuhiro6.util.{ULID => M6ULID}
 import de.huxhorn.sulky.ulid.{ULID => SulkyULID}
 import net.petitviolet.ulid4s.{ULID => PetitvioletULID}
 import org.openjdk.jmh.annotations.Benchmark
