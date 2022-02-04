@@ -1,4 +1,4 @@
-package com.github.mutsuhiro6.util.ulid
+package com.github.mutsuhiro6.util
 
 import org.scalatest._
 import flatspec._
@@ -14,7 +14,7 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
   it should "have the same bit info with generated from ULID string." in {
     val ulid01 = ULID.randomULID
     val ulidStr = ulid01.toString
-    val ulid02 = ULID.fromString(ulidStr)
+    val ulid02 = ULID.of(ulidStr)
     ulid01 should be(ulid02)
   }
 
@@ -34,9 +34,9 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
     a[IllegalArgumentException] should be thrownBy ULID(tooLargeTimestamp)
   }
 
-  "ULID.fromString" should "reject too large ULID (\"8ZZZZZZZZZZZZZZZZZZZZZZZZZ\")." in {
+  "ULID.of" should "reject too large ULID (\"8ZZZZZZZZZZZZZZZZZZZZZZZZZ\")." in {
     val tooLargeUlid = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(tooLargeUlid)
+    a[IllegalArgumentException] should be thrownBy ULID.of(tooLargeUlid)
   }
 
   it should "generate zero-filled String" in {
@@ -46,12 +46,12 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
 
   it should "reject invalid length ULID like \"0123456789ABCDEFGHJKMNPQRSTVWXYZ\")" in {
     val tooLongUlid = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(tooLongUlid)
+    a[IllegalArgumentException] should be thrownBy ULID.of(tooLongUlid)
   }
 
   it should "reject invalid character like \"\\t\"" in {
     val invalidUlid = "6ABC:EJ\nF9\r12HGJS0021\t1234"
-    a[IllegalArgumentException] should be thrownBy ULID.fromString(invalidUlid)
+    a[IllegalArgumentException] should be thrownBy ULID.of(invalidUlid)
   }
 
   it should "reject negative timestamp value" in {
@@ -73,8 +73,10 @@ class ULIDSpec extends AnyFlatSpec with should.Matchers:
   }
 
   it should "throw ArithmetricException when incremented ULID will be overflowed." in {
-    val ulid = ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZZ")
+    val ulid = ULID.of("01BX5ZZKBKZZZZZZZZZZZZZZZZ")
     val timestamp = ulid.timestamp
-    MonotonicULID.setPreviousULID(ulid)
+    import org.scalatest.PrivateMethodTester._
+    val setPreviousULIDMethod = PrivateMethod[Unit](Symbol("setPreviousULID"))
+    MonotonicULID invokePrivate setPreviousULIDMethod(ulid)
     a[ArithmeticException] should be thrownBy MonotonicULID(timestamp)
   }
