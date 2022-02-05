@@ -4,7 +4,7 @@ ULID generator implemented with Scala 3.
 
 ULID is the lexicographically sortable identifier it will be very useful for the primary keys on databases (my thoght) or so on.
 
-See details about the specifications of ULID on (ulid/spec)[https://github.com/ulid/spec].
+See details about the specifications of ULID on [ulid/spec](https://github.com/ulid/spec).
 
 ## Usage
 
