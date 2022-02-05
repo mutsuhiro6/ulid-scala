@@ -1,15 +1,11 @@
-import ReleaseUtil._
-
 val scala3Version = "3.1.0"
 val scala2Version = "2.13.7"
 
-lazy val basicSetting = Seq(
-  organization := "com.github.mutsuhiro6",
-  homepage := Some(url("https://github.com/mutsuhiro6/ulid-scala3")),
-  licenses := List(
-    "The MIT License" -> url("http://opensource.org/licenses/MIT")
-  ),
-  developers := List(
+ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / organization := "io.github.mutsuhiro6"
+ThisBuild / homepage := Some(url("https://github.com/mutsuhiro6/ulid-scala3"))
+ThisBuild /  licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT"))
+ThisBuild / developers := List(
     Developer(
       id = "mutsuhiro6",
       name = "Mutsuhiro Iwamoto",
@@ -17,18 +13,9 @@ lazy val basicSetting = Seq(
       url = url("https://github.com/mutsuhiro6")
     )
   )
-)
-ThisBuild / version := {
-  if (getCurrentBranchName == "main") {
-    val latestTag = getLatestTagOnCurrentBranch
-    if (isConformedSemVerSpec(latestTag)) latestTag
-    else getLatestCommitHash + "-" + getLatestCommitTimestamp + "-SNAPSHOT"
-  } else getLatestCommitHash + "-" + getLatestCommitTimestamp + "-SNAPSHOT"
-}
 
 lazy val lib = project
   .in(file("lib"))
-  .settings(basicSetting)
   .settings(
     name := "ulid-scala3",
     scalaVersion := scala3Version,
