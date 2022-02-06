@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sbt "clean; benchmark/Jmh/compile; benchmark/Jmh/run -i 10 -wi 10 -f1 -t1"
+sbt "clean; benchmark/Jmh/compile; benchmark/Jmh/run -i 10 -wi 10 -f1 -t1 $*"
