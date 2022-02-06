@@ -1,4 +1,4 @@
-package com.github.mutsuhiro6.util
+package io.github.mutsuhiro6.util
 
 import org.scalatest._
 import flatspec._

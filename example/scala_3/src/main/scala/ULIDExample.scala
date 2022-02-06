@@ -1,5 +1,5 @@
-import com.github.mutsuhiro6.util.ULID
-import com.github.mutsuhiro6.util.MonotonicULID
+import io.github.mutsuhiro6.util.ULID
+import io.github.mutsuhiro6.util.MonotonicULID
 
 @main def tryULID(): Unit =
 

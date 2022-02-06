@@ -1,4 +1,4 @@
-package com.github.mutsuhiro6.util
+package io.github.mutsuhiro6.util
 
 import java.util.concurrent.atomic.AtomicReference
 
