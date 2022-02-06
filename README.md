@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3)
+
 # ulid-scala3
 
 ULID generator implemented with Scala 3.
