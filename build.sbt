@@ -1,30 +1,33 @@
-val scala3Version = "3.1.0"
+val scala3Version = "3.1.1"
 val scala2Version = "2.13.7"
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
-ThisBuild / organization := "io.github.mutsuhiro6"
-ThisBuild / homepage := Some(url("https://github.com/mutsuhiro6/ulid-scala3"))
-ThisBuild /  licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT"))
-ThisBuild / developers := List(
-    Developer(
-      id = "mutsuhiro6",
-      name = "Mutsuhiro Iwamoto",
-      email = "mutsuhiro6@icloud.com",
-      url = url("https://github.com/mutsuhiro6")
-    )
+inThisBuild(
+  Seq(
+    organization := "io.github.mutsuhiro6",
+    homepage := Some(url("https://github.com/mutsuhiro6/ulid-scala3")),
+    licenses := Seq(
+      "The MIT License" -> url("http://opensource.org/licenses/MIT")
+    ),
+    developers := List(
+      Developer(
+        id = "mutsuhiro6",
+        name = "Mutsuhiro Iwamoto",
+        email = "mutsuhiro6@icloud.com",
+        url = url("https://github.com/mutsuhiro6")
+      )
+    ),
+    sonatypeCredentialHost := "s01.oss.sonatype.org",
+    sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
   )
+)
 
 lazy val lib = project
   .in(file("lib"))
   .settings(
     name := "ulid-scala3",
     scalaVersion := scala3Version,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test",
-    resolvers ++= Seq(
-      Resolver.sonatypeRepo("snapshots"),
-      Resolver.sonatypeRepo("releases")
-    ),
-    Test / publish / skip := true
+    crossScalaVersions := Seq("3.0.2", "3.1.1"),
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % "test"
   )
 
 lazy val benchmark = project
@@ -38,8 +41,7 @@ lazy val benchmark = project
       "net.petitviolet" % "ulid4s_2.13" % "0.5.0",
       "de.huxhorn.sulky" % "de.huxhorn.sulky.ulid" % "8.3.0"
     ),
-    scalaVersion := scala3Version,
-    crossScalaVersions := Seq(scala3Version, scala2Version)
+    scalaVersion := scala3Version
   )
   .enablePlugins(JmhPlugin)
   .dependsOn(lib)
@@ -65,5 +67,8 @@ lazy val exampleScala213 = project
 
 lazy val root = project
   .in(file("."))
-  .settings(name := "ulid-scala3-root")
+  .settings(
+    name := "ulid-scala3-root",
+    publish / skip := true
+  )
   .aggregate(lib)
