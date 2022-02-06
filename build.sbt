@@ -16,6 +16,7 @@ inThisBuild(
         url = url("https://github.com/mutsuhiro6")
       )
     ),
+    versionScheme := Some("semver-spec"),
     sonatypeCredentialHost := "s01.oss.sonatype.org",
     sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
   )
