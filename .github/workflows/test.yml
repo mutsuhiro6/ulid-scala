@@ -1,4 +1,4 @@
-name: Sbt Test CI
+name: Test
 
 on:
   push:
