@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3/badge.svg?syle=flat-square&gav=true)](https://maven-badges.herokuapp.com/maven-central/io.github.mutsuhiro6/ulid-scala3)
 
 # ulid-scala3
 
