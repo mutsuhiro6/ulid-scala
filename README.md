@@ -8,6 +8,21 @@ See details about the specifications of ULID on [ulid/spec](https://github.com/u
 
 ## Usage
 
+### Dependency
+
+For Scala 3,
+
+```scala
+libraryDependencies += "io.github.mutsuhiro6" %% "ulid-scala3" % "<version>"
+```
+
+This library only supports Scala 2.13.7,
+
+```scala
+libraryDependencies += "io.github.mutsuhiro6" % "ulid-scala3_3" % "<version>"
+scalacOptions ++= Seq("-Ytasty-reader")
+```
+
 ### Simple ULID generation
 
 You can generate ULID in the same way as `java.util.UUID`.
