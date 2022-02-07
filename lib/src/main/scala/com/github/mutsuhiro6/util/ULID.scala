@@ -127,32 +127,36 @@ object ULID:
     )
     base32Decode(ulid)
 
+  /** Crockford's Base32 encoding map */
+  private val encodeSymbols: Array[Char] = Array(
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+    'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X',
+    'Y', 'Z'
+  )
+
+  /** Crockford's Base32 decofing map */
+  private val decodeSymbols: Array[Byte] = Array[Byte](
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 9
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 19
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 29
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 39
+    -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, // 49
+    2, 3, 4, 5, 6, 7, 8, 9, -1, -1, // 59
+    -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, // 69
+    15, 16, 17, 1, 18, 19, 1, 20, 21, 0, // 79
+    22, 23, 24, 25, 26, -1, 27, 28, 29, 30, // 89
+    31, -1, -1, -1, -1, -1, -1, 10, 11, 12, // 99
+    13, 14, 15, 16, 17, 1, 18, 19, 1, 20, // 109
+    21, 0, 22, 23, 24, 25, 26, -1, 27, 28, // 119
+    29, 30, 31, -1, -1, -1, -1, -1 // 127
+  )
+
   /** Encodes a byte to char following the Crockford's Base 32 procedure. */
   private inline def crockfordsBase32Encoder: Int => Char =
-    val encodeSymbols: Array[Char] = Array(
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
-      'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X',
-      'Y', 'Z'
-    )
     symbolValue => encodeSymbols(symbolValue)
 
   /** Decodes a char to byte following the Crockford's Base 32 procedure. */
   private inline def crockfordsBase32Decoder: Char => Byte =
-    val decodeSymbols: Array[Byte] = Array[Byte](
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 9
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 19
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 29
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 39
-      -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, // 49
-      2, 3, 4, 5, 6, 7, 8, 9, -1, -1, // 59
-      -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, // 69
-      15, 16, 17, 1, 18, 19, 1, 20, 21, 0, // 79
-      22, 23, 24, 25, 26, -1, 27, 28, 29, 30, // 89
-      31, -1, -1, -1, -1, -1, -1, 10, 11, 12, // 99
-      13, 14, 15, 16, 17, 1, 18, 19, 1, 20, // 109
-      21, 0, 22, 23, 24, 25, 26, -1, 27, 28, // 119
-      29, 30, 31, -1, -1, -1, -1, -1 // 127
-    )
     encodeSymbol => decodeSymbols(encodeSymbol)
 
   /** Encode ULID bytes to base 32. */
@@ -178,9 +182,10 @@ object ULID:
   ): ULID =
     var msb = 0L
     var lsb = 0L
+    val carrier = ~(~0L >>> 5) //0xF800...0L
     for i <- 0 until 26 do
       msb <<= 5
-      msb |= ((lsb & ~(~0L >>> 5)) >>> (64 - 5)) //~(~0L >>> 5) is 0xF800...0L
+      msb |= ((lsb & carrier) >>> 59) // 64-5
       lsb <<= 5
       lsb |= decode(ulid.charAt(i))
     ULID(msb, lsb)
