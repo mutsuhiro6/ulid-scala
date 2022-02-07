@@ -169,7 +169,7 @@ object ULID:
       lsb >>>= 5
       lsb |= ((msb & 0x1fL) << (64 - 5))
       msb >>>= 5
-    encoded.reverseContents.toString
+    encoded.reverseInPlace.toString
 
   /** Decode a ULID String into a ULID object. */
   private def base32Decode(
